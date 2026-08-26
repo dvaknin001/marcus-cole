@@ -16,139 +16,214 @@
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{background:var(--dark);color:var(--ink);
-    font-family:'Archivo',system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
-  .wrap{max-width:460px;margin:0 auto;background:var(--bg);min-height:100vh;overflow:hidden;}
+    font-family:'Archivo',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;}
+  img{max-width:100%;display:block;}
+  a{color:var(--ink);text-decoration:none;}
+  p{margin:0;}
   .disp{font-family:'Anton','Arial Narrow',Impact,sans-serif;font-weight:400;
     text-transform:uppercase;line-height:0.92;letter-spacing:0.5px;margin:0;}
   .kick{font-family:'Archivo',system-ui,sans-serif;font-weight:700;
     text-transform:uppercase;letter-spacing:3px;}
   .cta{font-family:'Anton','Arial Narrow',Impact,sans-serif;text-transform:uppercase;
-    letter-spacing:1px;text-decoration:none;display:flex;align-items:center;
+    letter-spacing:1px;text-decoration:none;display:inline-flex;align-items:center;
     justify-content:center;gap:12px;color:#fff;}
-  a{color:var(--ink);text-decoration:none;}
-  p{margin:0;}
-  .sec{padding:52px 28px;}
   .stack{display:flex;flex-direction:column;}
-  .btn-red{background:var(--red);color:#fff;padding:18px 22px;font-size:21px;}
+  .btn-red{background:var(--red);color:#fff;padding:18px 26px;font-size:21px;}
   .btn-red:hover{filter:brightness(1.08);}
-  .btn-out{background:transparent;color:var(--ink);border:2px solid var(--red);
-    padding:15px 22px;font-size:19px;}
+  .btn-out{background:transparent;color:var(--ink);border:2px solid var(--red);padding:15px 24px;font-size:19px;}
   .btn-out:hover{background:rgba(226,59,46,0.12);}
   .arrow{flex-shrink:0;}
+  .inner{max-width:1080px;margin:0 auto;}
+
+  /* Sale strip + sticky bar */
+  .sale{background:var(--red);padding:10px 16px;text-align:center;}
+  .topbar{position:sticky;top:0;z-index:20;background:rgba(13,15,19,0.96);
+    backdrop-filter:blur(8px);border-bottom:1px solid var(--line);}
+  .topbar-in{max-width:1080px;margin:0 auto;display:flex;align-items:center;
+    justify-content:space-between;padding:13px 22px;}
+  .navlinks{display:flex;gap:8px;}
+
+  /* Sections */
+  .sec{padding:56px 22px;}
+  .sec-in{max-width:1080px;margin:0 auto;}
+
+  /* Hero */
+  .hero{background:var(--bg);border-bottom:1px solid var(--line);}
+  .hero-grid{display:flex;flex-direction:column;gap:26px;align-items:flex-start;}
+  .hero h1{font-size:clamp(46px,12vw,60px);}
+  .hero-cover{display:none;}
+  .price{display:flex;align-items:baseline;gap:12px;}
+  .price .now{font-size:32px;}
+  .price .was{font-size:18px;color:var(--dim);text-decoration:line-through;}
+
+  /* Confrontation */
+  .confront{background:var(--dark);}
+  .truths{display:flex;flex-direction:column;gap:20px;}
+  .truth{display:flex;gap:14px;align-items:flex-start;}
+  .truth .bar{width:22px;height:3px;background:var(--red);margin-top:12px;flex-shrink:0;}
+  .truth p{font-size:19px;line-height:1.35;color:#d8dce2;font-weight:600;}
+
+  /* Arsenal */
+  .arsenal{background:var(--bg2);}
+  .flagship{display:flex;flex-direction:column;gap:20px;align-items:center;text-align:center;}
+  .flagship img{width:200px;box-shadow:0 24px 50px rgba(0,0,0,0.6);}
+  .flagship .copy{display:flex;flex-direction:column;gap:20px;align-items:center;}
+  .book4{display:flex;gap:16px;align-items:center;background:var(--bg);
+    border:1px solid var(--line2);padding:16px;max-width:520px;margin:0 auto;}
+  .book4 img{width:84px;flex-shrink:0;box-shadow:0 10px 24px rgba(0,0,0,0.55);}
+
+  /* Who for */
+  .whofor-grid{display:flex;flex-direction:column;gap:22px;}
+
+  /* Final */
+  .final{background:var(--dark);border-top:3px solid var(--red);text-align:center;}
+  .final h2{font-size:clamp(46px,13vw,64px);}
+
+  .center{text-align:center;}
+  .sechead{display:flex;align-items:center;gap:10px;justify-content:center;}
+  .sechead .bar{width:26px;height:3px;background:var(--red);}
+
+  /* ===== TABLET / DESKTOP ===== */
+  @media (min-width:820px){
+    .sec{padding:80px 40px;}
+    .hero-grid{flex-direction:row;justify-content:space-between;align-items:center;gap:56px;}
+    .hero-text{max-width:600px;}
+    .hero h1{font-size:clamp(60px,6vw,86px);}
+    .hero p.sub{font-size:20px;max-width:520px;}
+    .hero-cover{display:block;flex-shrink:0;}
+    .hero-cover img{width:290px;box-shadow:0 30px 70px rgba(0,0,0,0.65);}
+    .confront h2{font-size:64px;}
+    .truths{display:grid;grid-template-columns:1fr 1fr;gap:24px 40px;}
+    .truth p{font-size:21px;}
+    .flagship{flex-direction:row;text-align:left;gap:48px;align-items:center;justify-content:center;}
+    .flagship img{width:260px;}
+    .flagship .copy{align-items:flex-start;text-align:left;max-width:460px;}
+    .flagship .copy .sechead,.flagship .copy .price{justify-content:flex-start;}
+    .book4{max-width:620px;}
+    .whofor-grid{flex-direction:row;gap:0;}
+    .whofor-grid .col{flex:1;padding:0 40px;}
+    .whofor-grid .col:first-child{border-right:1px solid var(--line);padding-left:0;}
+    .whofor h2{font-size:52px;}
+    .arsenal h2.punch{font-size:52px;}
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <!-- SALE STRIP -->
-  <div style="background:var(--red);padding:9px 16px;text-align:center;">
-    <span class="kick" style="font-size:11px;color:#fff;letter-spacing:2px;">Launch sale · 50% off · price going up soon</span>
-  </div>
+  <div class="sale"><span class="kick" style="font-size:11px;color:#fff;letter-spacing:2px;">Launch sale · 50% off · price going up soon</span></div>
 
-  <!-- TOP BAR (sticky) -->
-  <div style="position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:13px 20px;background:rgba(13,15,19,0.96);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);">
-    <span class="disp" style="font-size:17px;">Marcus Cole</span>
-    <div style="display:flex;gap:8px;">
-      <a href="https://www.amazon.com/dp/B0HG5TQX4J?maas=maas_adg_4AC031E3DBAF634CCA4A2895B90E00DF_afap_abs&ref_=aa_maas&tag=maas" class="kick" style="background:var(--red);color:#fff;padding:8px 12px;font-size:11px;letter-spacing:1px;">Lock In</a>
-      <span class="kick" style="border:1px solid var(--line2);color:var(--dim);padding:8px 12px;font-size:11px;letter-spacing:1px;">Book 4 · Soon</span>
+  <div class="topbar">
+    <div class="topbar-in">
+      <span class="disp" style="font-size:18px;">Marcus Cole</span>
+      <div class="navlinks">
+        <a href="https://www.amazon.com/dp/B0HG5TQX4J?maas=maas_adg_4AC031E3DBAF634CCA4A2895B90E00DF_afap_abs&ref_=aa_maas&tag=maas" class="kick" style="background:var(--red);color:#fff;padding:9px 14px;font-size:11px;letter-spacing:1px;">Lock In</a>
+        <span class="kick" style="border:1px solid var(--line2);color:var(--dim);padding:9px 14px;font-size:11px;letter-spacing:1px;">Book 4 · Soon</span>
+      </div>
     </div>
   </div>
 
   <!-- HERO -->
-  <div class="sec stack" style="gap:26px;padding-top:44px;border-bottom:1px solid var(--line);">
-    <div style="display:flex;align-items:center;gap:10px;">
-      <div style="width:26px;height:3px;background:var(--red);"></div>
-      <span class="kick" style="font-size:12px;color:var(--muted2);">Marcus Cole</span>
+  <section class="sec hero">
+    <div class="sec-in hero-grid">
+      <div class="hero-text stack" style="gap:26px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:26px;height:3px;background:var(--red);"></div>
+          <span class="kick" style="font-size:12px;color:var(--muted2);">Marcus Cole</span>
+        </div>
+        <h1 class="disp">The man you could be is watching the man <span style="color:var(--red);">you are.</span></h1>
+        <p class="sub" style="font-size:17px;color:var(--muted);">No motivation. No excuses. Just the discipline you keep swearing you will start Monday.</p>
+        <div class="price">
+          <span class="disp now">$9.99</span>
+          <span class="was">$19.99</span>
+          <span class="kick" style="font-size:11px;color:var(--red);letter-spacing:1px;">50% off</span>
+        </div>
+        <a class="cta btn-red" href="https://www.amazon.com/dp/B0HG5TQX4J?maas=maas_adg_4AC031E3DBAF634CCA4A2895B90E00DF_afap_abs&ref_=aa_maas&tag=maas">Get Lock In
+          <svg class="arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="square"><path d="M4 12h15"/><path d="M13 6l7 6-7 6"/></svg></a>
+        <span class="kick" style="font-size:10px;color:var(--dim);letter-spacing:2px;">Paperback · eBook · Hardcover on Amazon</span>
+      </div>
+      <div class="hero-cover"><img src="lockin-cover.jpg" alt="Lock In cover"></div>
     </div>
-    <h1 class="disp" style="font-size:54px;">The man you<br>could be is<br>watching the<br>man <span style="color:var(--red);">you are.</span></h1>
-    <p style="font-size:17px;line-height:1.5;color:var(--muted);max-width:320px;">No motivation. No excuses. Just the discipline you keep swearing you will start Monday.</p>
-    <div style="display:flex;align-items:baseline;gap:12px;">
-      <span class="disp" style="font-size:32px;">$9.99</span>
-      <span style="font-size:18px;color:var(--dim);text-decoration:line-through;">$19.99</span>
-      <span class="kick" style="font-size:11px;color:var(--red);letter-spacing:1px;">50% off</span>
-    </div>
-    <a class="cta btn-red" href="https://www.amazon.com/dp/B0HG5TQX4J?maas=maas_adg_4AC031E3DBAF634CCA4A2895B90E00DF_afap_abs&ref_=aa_maas&tag=maas">Get Lock In
-      <svg class="arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="square"><path d="M4 12h15"/><path d="M13 6l7 6-7 6"/></svg></a>
-    <span class="kick" style="font-size:10px;color:var(--dim);letter-spacing:2px;">Paperback · eBook · Hardcover on Amazon</span>
-  </div>
+  </section>
 
   <!-- CONFRONTATION -->
-  <div class="sec stack" style="gap:22px;background:var(--dark);">
-    <span class="kick" style="font-size:11px;color:var(--red);letter-spacing:3px;">Read this if you are honest</span>
-    <h2 class="disp" style="font-size:46px;margin-bottom:6px;">You already<br>know.</h2>
-    <div class="stack" style="gap:20px;">
-      <div style="display:flex;gap:14px;align-items:flex-start;"><div style="width:22px;height:3px;background:var(--red);margin-top:12px;flex-shrink:0;"></div><p style="font-size:19px;line-height:1.35;color:#d8dce2;font-weight:600;">You scroll to avoid your own thoughts.</p></div>
-      <div style="display:flex;gap:14px;align-items:flex-start;"><div style="width:22px;height:3px;background:var(--red);margin-top:12px;flex-shrink:0;"></div><p style="font-size:19px;line-height:1.35;color:#d8dce2;font-weight:600;">You call it tired. It is avoidance.</p></div>
-      <div style="display:flex;gap:14px;align-items:flex-start;"><div style="width:22px;height:3px;background:var(--red);margin-top:12px;flex-shrink:0;"></div><p style="font-size:19px;line-height:1.35;color:#d8dce2;font-weight:600;">You are not behind because of them. You are behind because of you.</p></div>
-      <div style="display:flex;gap:14px;align-items:flex-start;"><div style="width:22px;height:3px;background:var(--red);margin-top:12px;flex-shrink:0;"></div><p style="font-size:19px;line-height:1.35;color:#d8dce2;font-weight:600;">You have been about to start for three years.</p></div>
-      <div style="display:flex;gap:14px;align-items:flex-start;"><div style="width:22px;height:3px;background:var(--red);margin-top:12px;flex-shrink:0;"></div><p style="font-size:19px;line-height:1.35;color:#d8dce2;font-weight:600;">Nobody is coming to fix it. It was always you.</p></div>
-    </div>
-    <p style="font-size:17px;line-height:1.5;color:var(--muted2);margin-top:8px;">Sit with that. Then do something about it.</p>
-    <a class="cta btn-out" href="https://www.amazon.com/dp/B0HG5TQX4J?maas=maas_adg_4AC031E3DBAF634CCA4A2895B90E00DF_afap_abs&ref_=aa_maas&tag=maas" style="margin-top:6px;">Start With Lock In
-      <svg class="arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E23B2E" stroke-width="2.4" stroke-linecap="square"><path d="M4 12h15"/><path d="M13 6l7 6-7 6"/></svg></a>
-  </div>
-
-  <!-- THE ARSENAL -->
-  <div class="sec stack" style="gap:30px;background:var(--bg2);">
-    <div style="display:flex;align-items:center;gap:10px;justify-content:center;">
-      <div style="width:26px;height:3px;background:var(--red);"></div>
-      <span class="kick" style="font-size:11px;color:var(--muted2);">The Arsenal</span>
-      <div style="width:26px;height:3px;background:var(--red);"></div>
-    </div>
-
-    <div class="stack" style="gap:20px;">
-      <img src="lockin-cover.jpg" alt="Lock In cover" style="width:190px;align-self:center;box-shadow:0 24px 50px rgba(0,0,0,0.6);">
-      <h2 class="disp" style="font-size:42px;text-align:center;">100 punches<br>to the gut.<br>One a day.</h2>
-      <p style="font-size:16px;line-height:1.55;color:var(--muted);text-align:center;">Lock In. Discipline, strength, and focus stripped to the bone. No fluff. No filler. Open it, take the hit, go execute.</p>
-      <div style="display:flex;align-items:baseline;gap:12px;justify-content:center;">
-        <span class="disp" style="font-size:30px;">$9.99</span>
-        <span style="font-size:17px;color:var(--dim);text-decoration:line-through;">$19.99</span>
-        <span class="kick" style="font-size:11px;color:var(--red);letter-spacing:1px;">50% off</span>
+  <section class="sec confront">
+    <div class="sec-in stack" style="gap:26px;">
+      <span class="kick" style="font-size:11px;color:var(--red);letter-spacing:3px;">Read this if you are honest</span>
+      <h2 class="disp" style="font-size:clamp(40px,11vw,64px);">You already know.</h2>
+      <div class="truths">
+        <div class="truth"><div class="bar"></div><p>You scroll to avoid your own thoughts.</p></div>
+        <div class="truth"><div class="bar"></div><p>You call it tired. It is avoidance.</p></div>
+        <div class="truth"><div class="bar"></div><p>You are not behind because of them. You are behind because of you.</p></div>
+        <div class="truth"><div class="bar"></div><p>You have been about to start for three years.</p></div>
+        <div class="truth"><div class="bar"></div><p>Nobody is coming to fix it. It was always you.</p></div>
       </div>
-      <a class="cta btn-red" href="https://www.amazon.com/dp/B0HG5TQX4J?maas=maas_adg_4AC031E3DBAF634CCA4A2895B90E00DF_afap_abs&ref_=aa_maas&tag=maas">Read Lock In
-        <svg class="arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="square"><path d="M4 12h15"/><path d="M13 6l7 6-7 6"/></svg></a>
+      <p style="font-size:17px;color:var(--muted2);margin-top:6px;">Sit with that. Then do something about it.</p>
+      <a class="cta btn-out" href="https://www.amazon.com/dp/B0HG5TQX4J?maas=maas_adg_4AC031E3DBAF634CCA4A2895B90E00DF_afap_abs&ref_=aa_maas&tag=maas">Start With Lock In
+        <svg class="arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E23B2E" stroke-width="2.4" stroke-linecap="square"><path d="M4 12h15"/><path d="M13 6l7 6-7 6"/></svg></a>
     </div>
+  </section>
 
-    <div style="width:100%;height:1px;background:var(--line2);"></div>
-    <span class="kick" style="font-size:11px;color:var(--dim);letter-spacing:3px;text-align:center;">More from Marcus Cole</span>
-
-    <div style="display:flex;gap:16px;align-items:center;background:var(--bg);border:1px solid var(--line2);padding:16px;">
-      <img src="book4-cover.jpg" alt="Your Phone Owns You cover" style="width:82px;flex-shrink:0;box-shadow:0 10px 24px rgba(0,0,0,0.55);">
-      <div class="stack" style="gap:8px;">
-        <span class="kick" style="font-size:10px;color:var(--red);letter-spacing:2px;">Coming soon</span>
-        <span class="disp" style="font-size:24px;">Your Phone Owns You</span>
-        <span style="font-size:14px;line-height:1.4;color:var(--muted2);">Kill the scroll. Take your mind back. Same voice. Zero comfort.</span>
+  <!-- ARSENAL -->
+  <section class="sec arsenal">
+    <div class="sec-in stack" style="gap:36px;">
+      <div class="sechead"><div class="bar"></div><span class="kick" style="font-size:11px;color:var(--muted2);">The Arsenal</span><div class="bar"></div></div>
+      <div class="flagship">
+        <img src="lockin-cover.jpg" alt="Lock In cover">
+        <div class="copy">
+          <h2 class="disp punch" style="font-size:clamp(38px,10vw,52px);">100 punches to the gut. One a day.</h2>
+          <p style="font-size:16px;line-height:1.55;color:var(--muted);">Lock In. Discipline, strength, and focus stripped to the bone. No fluff. No filler. Open it, take the hit, go execute.</p>
+          <div class="price">
+            <span class="disp" style="font-size:30px;">$9.99</span>
+            <span class="was">$19.99</span>
+            <span class="kick" style="font-size:11px;color:var(--red);letter-spacing:1px;">50% off</span>
+          </div>
+          <a class="cta btn-red" href="https://www.amazon.com/dp/B0HG5TQX4J?maas=maas_adg_4AC031E3DBAF634CCA4A2895B90E00DF_afap_abs&ref_=aa_maas&tag=maas">Read Lock In
+            <svg class="arrow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="square"><path d="M4 12h15"/><path d="M13 6l7 6-7 6"/></svg></a>
+        </div>
+      </div>
+      <div style="height:1px;background:var(--line2);"></div>
+      <span class="kick center" style="font-size:11px;color:var(--dim);letter-spacing:3px;">More from Marcus Cole</span>
+      <div class="book4">
+        <img src="book4-cover.jpg" alt="Your Phone Owns You cover">
+        <div class="stack" style="gap:8px;">
+          <span class="kick" style="font-size:10px;color:var(--red);letter-spacing:2px;">Coming soon</span>
+          <span class="disp" style="font-size:26px;">Your Phone Owns You</span>
+          <span style="font-size:14px;line-height:1.4;color:var(--muted2);">Kill the scroll. Take your mind back. Same voice. Zero comfort.</span>
+        </div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- WHO IT'S FOR -->
-  <div class="sec stack" style="gap:26px;">
-    <h2 class="disp" style="font-size:40px;">This is not<br>for everyone.</h2>
-    <div class="stack" style="gap:14px;">
-      <span class="kick" style="font-size:12px;color:var(--red);letter-spacing:2px;">Pick it up if</span>
-      <p style="font-size:16px;line-height:1.45;color:#d8dce2;">You are sick of your own excuses. You want the truth, not a hug. And you will actually do the work.</p>
+  <!-- WHO FOR -->
+  <section class="sec whofor">
+    <div class="sec-in stack" style="gap:26px;">
+      <h2 class="disp" style="font-size:clamp(38px,10vw,52px);">This is not for everyone.</h2>
+      <div class="whofor-grid">
+        <div class="col stack" style="gap:14px;">
+          <span class="kick" style="font-size:12px;color:var(--red);letter-spacing:2px;">Pick it up if</span>
+          <p style="font-size:16px;line-height:1.45;color:#d8dce2;">You are sick of your own excuses. You want the truth, not a hug. And you will actually do the work.</p>
+        </div>
+        <div class="col stack" style="gap:14px;">
+          <span class="kick" style="font-size:12px;color:var(--dim);letter-spacing:2px;">Close the tab if</span>
+          <p style="font-size:16px;line-height:1.45;color:var(--muted2);">You want comfort. You need permission. You are just here for the next dopamine hit.</p>
+        </div>
+      </div>
     </div>
-    <div style="width:100%;height:1px;background:var(--line);"></div>
-    <div class="stack" style="gap:14px;">
-      <span class="kick" style="font-size:12px;color:var(--dim);letter-spacing:2px;">Close the tab if</span>
-      <p style="font-size:16px;line-height:1.45;color:var(--muted2);">You want comfort. You need permission. You are just here for the next dopamine hit.</p>
+  </section>
+
+  <!-- FINAL -->
+  <section class="sec final">
+    <div class="sec-in stack" style="gap:26px;align-items:center;">
+      <h2 class="disp">Stop reading.<br><span style="color:var(--red);">Lock in.</span></h2>
+      <a class="cta btn-red" href="https://www.amazon.com/dp/B0HG5TQX4J?maas=maas_adg_4AC031E3DBAF634CCA4A2895B90E00DF_afap_abs&ref_=aa_maas&tag=maas" style="font-size:23px;padding:20px 30px;">Get It On Amazon
+        <svg class="arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="square"><path d="M4 12h15"/><path d="M13 6l7 6-7 6"/></svg></a>
     </div>
-  </div>
+  </section>
 
-  <!-- FINAL CTA -->
-  <div class="sec stack" style="gap:24px;background:var(--dark);border-top:3px solid var(--red);padding-top:60px;padding-bottom:60px;">
-    <h2 class="disp" style="font-size:52px;text-align:center;">Stop reading.<br><span style="color:var(--red);">Lock in.</span></h2>
-    <a class="cta btn-red" href="https://www.amazon.com/dp/B0HG5TQX4J?maas=maas_adg_4AC031E3DBAF634CCA4A2895B90E00DF_afap_abs&ref_=aa_maas&tag=maas" style="font-size:23px;padding:20px 22px;">Get It On Amazon
-      <svg class="arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="square"><path d="M4 12h15"/><path d="M13 6l7 6-7 6"/></svg></a>
-  </div>
-
-  <!-- FOOTER -->
-  <div class="stack" style="gap:8px;padding:34px 28px 44px 28px;align-items:center;">
+  <footer class="stack" style="gap:8px;padding:36px 22px 48px 22px;align-items:center;">
     <span class="disp" style="font-size:22px;">Marcus Cole</span>
     <span style="font-size:13px;color:var(--dim);letter-spacing:1px;">Discipline is a decision.</span>
-  </div>
+  </footer>
 
-</div>
 </body>
 </html>
