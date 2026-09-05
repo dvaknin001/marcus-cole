@@ -41,9 +41,10 @@ Both Marcus books are print-ready and approved on BookVault:
 
 `PRODUCT_MAP` now has three rows (see the function). Each needs a matching Gumroad
 PHYSICAL product with the exact permalink:
-- `lockinpaperback`       -> Lock In
-- `yourphonepaperback`    -> Your Phone Owns You
-- `marcuspaperbackbundle` -> BOTH books in one order (the bundle)
+- `lockinpaperback`       -> Lock In (9656946000010)
+- `yourphonepaperback`    -> Your Phone Owns You (9656946000034)
+- `marcuspaperbackbundle` -> BookVault Bundle title **9656946000041** (one SKU that
+                             contains both books; US print cost ~$5.45, one shipment)
 
 ## To go live (5 min, needs you)
 1. Gumroad: create the two missing PHYSICAL products with permalinks `yourphonepaperback`
