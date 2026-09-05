@@ -426,8 +426,11 @@ export async function onRequestGet(context) {
       return json({ ...result, error: "missing LULU_CLIENT_KEY or LULU_CLIENT_SECRET" });
     }
 
-    // Lock In only, qty 1, from the same env URLs the live path uses.
-    const built = buildLineItems(env, PRODUCTS[0], 1);
+    // Which product to prove: ?book=<index into PRODUCTS> (default 0 = Lock In).
+    // qty 1, from the same env URLs the live path uses.
+    const product = PRODUCTS[Number(url.searchParams.get("book")) || 0] || PRODUCTS[0];
+    result.product = product.title;
+    const built = buildLineItems(env, product, 1);
     if (!built.ok) return json({ ...result, error: "missing source url", missing: built.missing });
 
     // A fixed public address (the Library of Congress). Not a person, no PII.
