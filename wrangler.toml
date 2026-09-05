@@ -8,3 +8,11 @@ compatibility_date = "2024-09-01"
 [[kv_namespaces]]
 binding = "ORDERS"
 id = "bf214d8b1ba1468e8dd33910b99b6be7"
+
+# KV namespace holding the print ready book PDFs (cover + interior per book).
+# Served privately by functions/api/asset.js behind the ASSET_TOKEN secret, so the
+# full books are never in the public repo. Lulu fetches these URLs at order time.
+#   keys: lockin-cover, lockin-interior, yourphone-cover, yourphone-interior
+[[kv_namespaces]]
+binding = "BOOKFILES"
+id = "e1730d9c6e534525bfa60152332ff72a"
