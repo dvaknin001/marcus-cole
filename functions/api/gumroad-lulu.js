@@ -451,6 +451,25 @@ export async function onRequestGet(context) {
     if (!tok.ok) return json({ ...result, error: "lulu auth failed" });
     const token = tok.token;
 
+    // ?costall=1 : quote EVERY Lulu shipping level for this book to a US address.
+    // Cost calc only, no job is created. Answers "what shipping speeds and prices
+    // does Lulu actually offer for these packages".
+    if (url.searchParams.get("costall")) {
+      const LEVELS = ["MAIL", "PRIORITY_MAIL", "GROUND_HD", "GROUND_BUS", "GROUND", "EXPEDITED", "EXPRESS"];
+      const quotes = {};
+      for (const lvl of LEVELS) {
+        const c = await luluFetch(base, token, "/print-job-cost-calculations/", "POST", {
+          line_items: built.lineItems.map((li) => ({ page_count: li.page_count, pod_package_id: li.pod_package_id, quantity: li.quantity })),
+          shipping_address: address,
+          shipping_option: lvl,
+        });
+        quotes[lvl] = c.ok
+          ? { ship: toNum(c.body && c.body.shipping_cost && c.body.shipping_cost.total_cost_incl_tax), total: toNum(c.body && c.body.total_cost_incl_tax), currency: c.body && c.body.currency }
+          : { error: (c.raw || "").slice(0, 160) };
+      }
+      return json({ ok: true, product: product.title, quotesInclTax: quotes });
+    }
+
     // Cost calc first: cheap, and it validates address plus package before we create.
     const calc = await luluFetch(base, token, "/print-job-cost-calculations/", "POST", {
       line_items: built.lineItems.map((li) => ({ page_count: li.page_count, pod_package_id: li.pod_package_id, quantity: li.quantity })),
