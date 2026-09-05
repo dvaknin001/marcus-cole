@@ -591,6 +591,7 @@ function buildLineItems(env, product, saleQty) {
       page_count: spec.page_count,
       quantity,
       printable_normalization: {
+        pod_package_id: spec.pod_package_id,
         cover: { source_url: cover },
         interior: { source_url: interior },
       },
