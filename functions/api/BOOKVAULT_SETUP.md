@@ -34,9 +34,30 @@ ship straight to the buyer. No Payhip, no separate checkout.
    Check Cloudflare, this project, Functions, Real time logs for the `[bv] DRY_RUN quote` line.
 6. **Go live**: set `DRY_RUN=false`. From then on every paperback sale auto places a BookVault order.
 
+## Current map (2026-09-05)
+Both Marcus books are print-ready and approved on BookVault:
+- Lock In = ISBN **9656946000010**
+- Your Phone Owns You = ISBN **9656946000034** (122 pages, gutter fixed + re-approved)
+
+`PRODUCT_MAP` now has three rows (see the function). Each needs a matching Gumroad
+PHYSICAL product with the exact permalink:
+- `lockinpaperback`       -> Lock In
+- `yourphonepaperback`    -> Your Phone Owns You
+- `marcuspaperbackbundle` -> BOTH books in one order (the bundle)
+
+## To go live (5 min, needs you)
+1. Gumroad: create the two missing PHYSICAL products with permalinks `yourphonepaperback`
+   and `marcuspaperbackbundle` (Lock In Paperback already exists).
+   Price ~$16.99 each, bundle ~$27.99. Turn ON "require shipping information".
+2. Confirm the Gumroad ping URL is `https://marcuscole.pages.dev/api/gumroad-bookvault`.
+3. Place ONE test paperback order with DRY_RUN=true and check Cloudflare Functions logs for
+   the `[bv] DRY_RUN quote` line (proves the address + ISBN mapping works, no order placed).
+4. Flip Cloudflare env `DRY_RUN=false`. From then, every paperback sale auto prints + ships.
+5. Swap the site's "paperback coming soon" spans for the Gumroad buy buttons.
+
 ## Add more paperbacks later
 Edit `PRODUCT_MAP` in `gumroad-bookvault.js`: one row per Gumroad physical product permalink ->
-BookVault ISBN. Redeploy.
+one or more BookVault ISBNs (bundle = more than one line). Redeploy.
 
 ## Notes / still to confirm on the first real order
 - `Address.Country` is sent as an ISO code ("US"). If BookVault rejects it on the first live
