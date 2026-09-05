@@ -13,9 +13,12 @@
 //                       Set to "false" only when you are ready to place real orders.
 //
 // Product to book mapping. Add a row per paperback you sell. The key is the Gumroad
-// product permalink (the slug in dvpress.gumroad.com/l/<permalink>).
+// product permalink (the slug in dvpress.gumroad.com/l/<permalink>). "lines" lists the
+// BookVault ISBNs to print for that product; a bundle simply lists more than one.
 const PRODUCT_MAP = {
-  lockinpaperback: { isbn: "9656946000010", title: "Lock In" },
+  lockinpaperback:        { title: "Lock In",              lines: [{ isbn: "9656946000010", qty: 1 }] },
+  yourphonepaperback:     { title: "Your Phone Owns You",  lines: [{ isbn: "9656946000034", qty: 1 }] },
+  marcuspaperbackbundle:  { title: "Marcus Cole Bundle",   lines: [{ isbn: "9656946000010", qty: 1 }, { isbn: "9656946000034", qty: 1 }] },
 };
 
 const BV = "https://api.bookvault.app/v3";
@@ -50,6 +53,8 @@ export async function onRequestPost(context) {
   // 3. build the BookVault order from Gumroad shipping fields
   const qty = parseInt(p.quantity || "1", 10) || 1;
   const country = isoCountry(p.country || p.shipping_country || "US");
+  // one product may print several ISBNs (a bundle); multiply each line by the qty bought
+  const orderLines = book.lines.map((l) => ({ ISBN: l.isbn, Quantity: (l.qty || 1) * qty }));
   const order = {
     CustRef: p.sale_id || p.order_number || ("GUM-" + Date.now()),
     OrderMethod: "API",
@@ -66,7 +71,7 @@ export async function onRequestPost(context) {
       TelNumber: p.phone || "",
       ShippingLevel: "CheapestTracked",
     },
-    OrderLines: [{ ISBN: book.isbn, Quantity: qty }],
+    OrderLines: orderLines,
   };
 
   const auth = { Authorization: "basic " + env.BOOKVAULT_API_KEY, "Content-Type": "application/json" };
