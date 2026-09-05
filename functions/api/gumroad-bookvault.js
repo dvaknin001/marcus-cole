@@ -18,7 +18,7 @@
 const PRODUCT_MAP = {
   lockinpaperback:        { title: "Lock In",              lines: [{ isbn: "9656946000010", qty: 1 }] },
   yourphonepaperback:     { title: "Your Phone Owns You",  lines: [{ isbn: "9656946000034", qty: 1 }] },
-  marcuspaperbackbundle:  { title: "Marcus Cole Bundle",   lines: [{ isbn: "9656946000010", qty: 1 }, { isbn: "9656946000034", qty: 1 }] },
+  marcuspaperbackbundle:  { title: "Marcus Cole Bundle",   lines: [{ isbn: "9656946000041", qty: 1 }] },
 };
 
 const BV = "https://api.bookvault.app/v3";
