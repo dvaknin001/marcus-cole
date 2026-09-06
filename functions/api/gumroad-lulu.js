@@ -464,7 +464,13 @@ export async function onRequestGet(context) {
           shipping_option: lvl,
         });
         quotes[lvl] = c.ok
-          ? { ship: toNum(c.body && c.body.shipping_cost && c.body.shipping_cost.total_cost_incl_tax), total: toNum(c.body && c.body.total_cost_incl_tax), currency: c.body && c.body.currency }
+          ? {
+              shipExcl: toNum(c.body && c.body.shipping_cost && c.body.shipping_cost.total_cost_excl_tax),
+              printExcl: c.body && Array.isArray(c.body.line_item_costs) ? round2(c.body.line_item_costs.reduce((s, x) => s + toNum(x.total_cost_excl_tax), 0)) : null,
+              totalExcl: toNum(c.body && c.body.total_cost_excl_tax),
+              totalIncl: toNum(c.body && c.body.total_cost_incl_tax),
+              currency: c.body && c.body.currency,
+            }
           : { error: (c.raw || "").slice(0, 160) };
       }
       return json({ ok: true, product: product.title, quotesInclTax: quotes });
