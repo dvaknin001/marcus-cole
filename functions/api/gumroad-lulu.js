@@ -453,6 +453,15 @@ export async function onRequestGet(context) {
     if (!tok.ok) return json({ ...result, error: "lulu auth failed" });
     const token = tok.token;
 
+    // ?cancel=<jobId> : cancel an UNPAID Lulu print job (operator cleanup). Token
+    // gated by the same selftest token. Used to undo a job created by mistake.
+    if (url.searchParams.get("cancel")) {
+      const jid = url.searchParams.get("cancel");
+      const c = await luluFetch(base, token, "/print-jobs/" + encodeURIComponent(jid) + "/status/", "PUT", { name: "CANCELED" });
+      const chk = await luluFetch(base, token, "/print-jobs/" + encodeURIComponent(jid) + "/status/", "GET");
+      return json({ ok: c.ok, jobId: jid, cancelStatus: c.status, jobStatus: chk.body ? chk.body.name : null, error: c.ok ? undefined : (c.raw || "").slice(0, 300) });
+    }
+
     // ?costall=1 : quote EVERY Lulu shipping level for this book to a US address.
     // Cost calc only, no job is created. Answers "what shipping speeds and prices
     // does Lulu actually offer for these packages".
