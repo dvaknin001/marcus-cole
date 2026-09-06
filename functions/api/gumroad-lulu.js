@@ -114,13 +114,15 @@ function lookupBook(sale) {
 
 // Shipping tier to Lulu shipping_level. Lulu's levels are MAIL, PRIORITY_MAIL,
 // GROUND_HD, GROUND_BUS, GROUND, EXPEDITED, EXPRESS. For our packages to a US
-// address Lulu does NOT offer GROUND, and EXPRESS costs about 35 USD, so:
-//   standard = MAIL       (cheapest tracked option Lulu offers here)
-//   express  = EXPEDITED  (faster, still sane cost; never EXPRESS)
+// address Lulu does NOT offer plain GROUND, EXPEDITED ships ~22 USD and EXPRESS
+// ~38 USD (both eat the margin at our prices), so:
+//   standard = MAIL       (Media Mail, ~6 USD, 5 to 8 days, cheapest tracked)
+//   express  = GROUND_HD   (ground home delivery, ~14.57 USD, 3 to 6 days, keeps
+//                           the current Gumroad Express price profitable)
 // These are the only two values this function will ever send.
 const TIER = {
   standard: { shippingLevel: "MAIL" },
-  express:  { shippingLevel: "EXPEDITED" },
+  express:  { shippingLevel: "GROUND_HD" },
 };
 
 // Countries we currently fulfil. Cost and shipping levels are only validated for
