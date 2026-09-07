@@ -135,10 +135,11 @@ const SUPPORTED_COUNTRIES = new Set(["US"]);
 // shipping at a loss (e.g. a discount code stacked with express shipping).
 const MARGIN_FLOOR_USD = 1.5;
 
-// Fixed token for the operator self test (GET path at the bottom of this file).
-// It only gates a free create then cancel round trip; it cannot read sales or KV.
-const SELFTEST_TOKEN = "b7f3a1c92e6d4f08";
-
+// Operator self test token (GET path at the bottom of this file). It gates a free
+// create then cancel round trip AND the cancel-any-job cleanup, so it MUST live in
+// an env secret, never in this public repo. Set SELFTEST_TOKEN in Cloudflare Pages
+// (Settings, Environment variables, Encrypted). If it is unset, the GET path is
+// closed entirely (403), so a missing secret can never fall open.
 const GUMROAD = "https://api.gumroad.com/v2";
 
 // Lulu base URL from env. Production and sandbox are separate systems with
@@ -333,9 +334,14 @@ export async function onRequestPost(context) {
     // ---- 14. the print job. external_id is our sale id so the Lulu dashboard and
     // KV agree on which sale a job belongs to (Lulu treats it as a reference, our
     // KV write is the real idempotency lock).
+    // production_delay holds a paid job in PRODUCTION_DELAYED (still CANCELable) for
+    // this many minutes before it locks into production. Lulu's default is 60; we set
+    // 1440 (24h) so a mistaken live order has a full day to be caught and canceled via
+    // the operator cancel endpoint, regardless of the 12h payment batch window.
     const job = {
       external_id: saleId,
       contact_email: str(env.LULU_CONTACT_EMAIL) || "golpo.yta@protonmail.com",
+      production_delay: 1440,
       line_items: lineItems,
       shipping_level: shippingLevel,
       shipping_address: address,
@@ -418,7 +424,10 @@ export async function onRequestGet(context) {
 
   let url;
   try { url = new URL(request.url); } catch (e) { return json({ ok: false, error: "bad url" }, 400); }
-  if (url.searchParams.get("selftest") !== SELFTEST_TOKEN) {
+  // Token comes from an env secret. If it is unset, or does not match, the whole
+  // GET path (selftest, cancel-any-job, cost matrix) is closed. Never falls open.
+  const selftestToken = str(env.SELFTEST_TOKEN);
+  if (!selftestToken || url.searchParams.get("selftest") !== selftestToken) {
     return json({ ok: false, error: "forbidden" }, 403);
   }
 
