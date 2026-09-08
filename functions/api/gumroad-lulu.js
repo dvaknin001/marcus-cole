@@ -27,6 +27,7 @@
 //   LULU_CONTACT_EMAIL   optional, the owner email Lulu contacts about a job
 //   LULU_URL_LOCKIN_COVER, LULU_URL_LOCKIN_INTERIOR
 //   LULU_URL_YOURPHONE_COVER, LULU_URL_YOURPHONE_INTERIOR
+//   LULU_URL_CLAIRE_COVER, LULU_URL_CLAIRE_INTERIOR
 //                        public URLs of the print ready PDFs Lulu downloads. Kept in
 //                        env so hosting can move without a code edit.
 //   GUMROAD_API_TOKEN    Gumroad API access token, used to fetch the authoritative sale
@@ -69,6 +70,17 @@ const BOOKS = {
     coverEnv: "LULU_URL_YOURPHONE_COVER",
     interiorEnv: "LULU_URL_YOURPHONE_INTERIOR",
   },
+  // Claire Donovan title (separate pen name, same print pipeline). printCostUSD is an
+  // estimate interpolated from the two rows above (1.99 + 0.025 per page); replace it
+  // with the line_item cost the selftest costCalc step reports for this book.
+  claire: {
+    title: "Come Back to You",
+    pod_package_id: "0550X0850.BW.STD.PB.060UW444.MXX",
+    page_count: 130,
+    printCostUSD: 5.24,
+    coverEnv: "LULU_URL_CLAIRE_COVER",
+    interiorEnv: "LULU_URL_CLAIRE_INTERIOR",
+  },
 };
 
 // Product to book mapping. One row per paperback product on Gumroad.
@@ -91,6 +103,13 @@ const PRODUCTS = [
     title: "Marcus Cole Bundle",
     keys: ["maecjf", "marcuspaperbackbundle", "1UKJeFBLB0BJ-4KlPWMMZQ=="],
     lines: [{ book: "lockin", qty: 1 }, { book: "yourphone", qty: 1 }],
+  },
+  // index 3. No Gumroad product yet: the key is a placeholder slug so the selftest can
+  // target this row (?book=3). Add the real short code and product_id once listed.
+  {
+    title: "Come Back to You",
+    keys: ["clairepaperback"],
+    lines: [{ book: "claire", qty: 1 }],
   },
 ];
 
@@ -415,9 +434,12 @@ export async function onRequestPost(context) {
 // validation errors, so a broken PDF URL or wrong page count surfaces here rather
 // than on a customer order. Touches no KV and reads no Gumroad data.
 //
-// URL: GET /api/gumroad-lulu?selftest=b7f3a1c92e6d4f08
+// URL: GET /api/gumroad-lulu?selftest=<SELFTEST_TOKEN>[&book=<n>]
 // If cancel fails the response says so loudly with the id: cancel it by hand in the
 // Lulu dashboard before it ever gets paid.
+// Read only modes (no job is created): &coverdims=1&pod=<pod>&pages=<n> (exact wrap
+// size), &validate=1 then &validate=<id>&kind=interior|cover (free file validation),
+// &costall=1 (shipping matrix). Cleanup: &cancel=<jobId>.
 export async function onRequestGet(context) {
   const { request, env } = context;
   const log = (...a) => console.log("[lulu selftest]", ...a);
@@ -442,7 +464,9 @@ export async function onRequestGet(context) {
     const product = PRODUCTS[Number(url.searchParams.get("book")) || 0] || PRODUCTS[0];
     result.product = product.title;
     const built = buildLineItems(env, product, 1);
-    if (!built.ok) return json({ ...result, error: "missing source url", missing: built.missing });
+    // coverdims needs no source files (it only asks Lulu for a wrap size), so it may run
+    // for a book whose PDF URLs are not in env yet.
+    if (!built.ok && !url.searchParams.get("coverdims")) return json({ ...result, error: "missing source url", missing: built.missing });
 
     // A fixed public address (the Library of Congress). Not a person, no PII.
     const address = {
@@ -461,6 +485,57 @@ export async function onRequestGet(context) {
     result.steps.push({ step: "auth", ok: tok.ok, status: tok.status });
     if (!tok.ok) return json({ ...result, error: "lulu auth failed" });
     const token = tok.token;
+
+    // ?coverdims=1&pod=<pod_package_id>&pages=<n> : ask Lulu for the exact full cover
+    // wrap size (bleed and spine included) for a pod package at a page count. Free,
+    // read only, creates nothing. Defaults to the selected product's first line. The
+    // spine is derived from the width: Lulu reports width and height only, so
+    // spine = width minus 2 x (trim width + 0.125 in bleed), trim width parsed from
+    // the pod id (0550X0850 = 5.50 x 8.50 in).
+    if (url.searchParams.get("coverdims")) {
+      const first = BOOKS[product.lines[0].book] || {};
+      const pod = str(url.searchParams.get("pod")) || first.pod_package_id;
+      const pages = parseInt(url.searchParams.get("pages"), 10) || first.page_count;
+      if (!pod || !pages) return json({ ok: false, error: "pod and pages required" }, 400);
+      const cd = await luluFetch(base, token, "/cover-dimensions/", "POST", { pod_package_id: pod, interior_page_count: pages, unit: "pt" });
+      if (!cd.ok || !cd.body || cd.body.width == null) {
+        return json({ ok: false, pod, pages, status: cd.status, error: (cd.raw || "").slice(0, 400) });
+      }
+      const wPt = Number(cd.body.width), hPt = Number(cd.body.height);
+      const m = /^(\d{4})X(\d{4})/.exec(pod);
+      const trimWIn = m ? Number(m[1]) / 100 : null;
+      const trimHIn = m ? Number(m[2]) / 100 : null;
+      const spinePt = trimWIn != null ? round2(wPt - 2 * (trimWIn + 0.125) * 72) : null;
+      return json({
+        ok: true, pod, pages, unit: cd.body.unit || "pt",
+        width_pt: wPt, height_pt: hPt,
+        width_in: Math.round(wPt / 72 * 10000) / 10000, height_in: Math.round(hPt / 72 * 10000) / 10000,
+        spine_pt: spinePt, spine_in: spinePt != null ? Math.round(spinePt / 72 * 10000) / 10000 : null,
+        trim_in: trimWIn != null ? trimWIn + " x " + trimHIn : null,
+        raw: cd.body,
+      });
+    }
+
+    // ?validate=1 : free file validation without a print job. Submits the selected
+    // product's interior and cover source URLs to Lulu's validators and returns the
+    // job ids (validation is asynchronous). Poll with ?validate=<id>&kind=interior|cover
+    // until status is VALIDATED / NORMALIZED (good) or ERROR (errors listed).
+    if (url.searchParams.get("validate")) {
+      const v = url.searchParams.get("validate");
+      const kind = str(url.searchParams.get("kind")) === "cover" ? "cover" : "interior";
+      if (v !== "1") {
+        const g = await luluFetch(base, token, "/validate-" + kind + "/" + encodeURIComponent(v) + "/", "GET");
+        return json({ ok: g.ok, kind, id: v, status: g.status, body: g.body, error: g.ok ? undefined : (g.raw || "").slice(0, 400) });
+      }
+      const li = built.lineItems[0];
+      const out = { ok: true, product: product.title, pod: li.pod_package_id, pages: li.page_count };
+      const vi = await luluFetch(base, token, "/validate-interior/", "POST", { source_url: li.printable_normalization.interior.source_url, pod_package_id: li.pod_package_id });
+      out.interior = vi.ok ? { id: vi.body && vi.body.id, status: vi.body && vi.body.status, page_count: vi.body && vi.body.page_count, errors: vi.body && vi.body.errors } : { error: (vi.raw || "").slice(0, 400), status: vi.status };
+      const vc = await luluFetch(base, token, "/validate-cover/", "POST", { source_url: li.printable_normalization.cover.source_url, pod_package_id: li.pod_package_id, interior_page_count: li.page_count });
+      out.cover = vc.ok ? { id: vc.body && vc.body.id, status: vc.body && vc.body.status, errors: vc.body && vc.body.errors } : { error: (vc.raw || "").slice(0, 400), status: vc.status };
+      out.ok = vi.ok && vc.ok;
+      return json(out);
+    }
 
     // ?cancel=<jobId> : cancel an UNPAID Lulu print job (operator cleanup). Token
     // gated by the same selftest token. Used to undo a job created by mistake.
