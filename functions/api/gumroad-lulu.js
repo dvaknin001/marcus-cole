@@ -70,12 +70,13 @@ const BOOKS = {
     coverEnv: "LULU_URL_YOURPHONE_COVER",
     interiorEnv: "LULU_URL_YOURPHONE_INTERIOR",
   },
-  // Claire Donovan title (separate pen name, same print pipeline). printCostUSD is an
-  // estimate interpolated from the two rows above (1.99 + 0.025 per page); replace it
-  // with the line_item cost the selftest costCalc step reports for this book.
+  // Claire D. Colton title (separate pen name, same print pipeline). CREAM interior paper
+  // (060UC444), unlike the white paper rows above. printCostUSD is an estimate
+  // interpolated from the two rows above (1.99 + 0.025 per page); replace it with the
+  // line_item cost the selftest costCalc step reports for this book.
   claire: {
     title: "Come Back to You",
-    pod_package_id: "0550X0850.BW.STD.PB.060UW444.MXX",
+    pod_package_id: "0550X0850.BW.STD.PB.060UC444.MXX",
     page_count: 130,
     printCostUSD: 5.24,
     coverEnv: "LULU_URL_CLAIRE_COVER",
