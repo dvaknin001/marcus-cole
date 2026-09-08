@@ -8,7 +8,7 @@
 // SECRET (set in Cloudflare Pages, never in the repo): ASSET_TOKEN
 // BINDING (wrangler.toml): BOOKFILES KV namespace.
 
-const ALLOWED = new Set(["lockin-cover", "lockin-interior", "yourphone-cover", "yourphone-interior", "claire-cover", "claire-interior"]);
+const ALLOWED = new Set(["lockin-cover", "lockin-interior", "yourphone-cover", "yourphone-interior"]);
 
 export async function onRequestGet(context) {
   const { request, env } = context;
