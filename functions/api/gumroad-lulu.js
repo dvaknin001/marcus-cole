@@ -462,6 +462,29 @@ export async function onRequestGet(context) {
     if (!tok.ok) return json({ ...result, error: "lulu auth failed" });
     const token = tok.token;
 
+    // ?getjob=<jobId> : READ ONLY. Fetch a print job's full detail + status so we can
+    // see what it was, where it shipped, its cost, and its external_id (a live sale
+    // carries the Gumroad sale_id; a self test carries "selftest_<ts>"). Touches nothing.
+    if (url.searchParams.get("getjob")) {
+      const jid = url.searchParams.get("getjob");
+      const d = await luluFetch(base, token, "/print-jobs/" + encodeURIComponent(jid) + "/", "GET");
+      const s = await luluFetch(base, token, "/print-jobs/" + encodeURIComponent(jid) + "/status/", "GET");
+      const b = d.body || {};
+      return json({
+        ok: d.ok, jobId: jid, httpStatus: d.status,
+        status: s.body ? s.body.name : (b.status && b.status.name),
+        statusMessage: s.body ? s.body.message : undefined,
+        external_id: b.external_id,
+        contact_email: b.contact_email,
+        date_created: b.date_created,
+        line_items: Array.isArray(b.line_items) ? b.line_items.map((li) => ({ title: li.title, quantity: li.quantity, pod_package_id: li.pod_package_id, tracking: li.tracking_id, carrier: li.tracking_urls })) : undefined,
+        shipping_address: b.shipping_address,
+        shipping_level: b.shipping_level,
+        costs: b.costs ? { total_cost_incl_tax: b.costs.total_cost_incl_tax, currency: b.costs.currency, shipping: b.costs.shipping_cost && b.costs.shipping_cost.total_cost_incl_tax } : undefined,
+        error: d.ok ? undefined : (d.raw || "").slice(0, 300),
+      });
+    }
+
     // ?cancel=<jobId> : cancel an UNPAID Lulu print job (operator cleanup). Token
     // gated by the same selftest token. Used to undo a job created by mistake.
     if (url.searchParams.get("cancel")) {
@@ -508,6 +531,18 @@ export async function onRequestGet(context) {
       total: calc.ok && calc.body ? toNum(calc.body.total_cost_incl_tax) : null,
       error: calc.ok ? undefined : (calc.raw || "").slice(0, 500),
     });
+
+    // SAFETY: creating a real print job is DANGEROUS once a card is on file — Lulu
+    // auto-charges and PRINTS any UNPAID job, and a create+cancel where the cancel
+    // silently fails leaks to production (this shipped 2 test books to the Library of
+    // Congress, Sept 2026). The default self test now stops here: auth + cost calc +
+    // file/address validation are all free and non-creating. Only ?create=1 (explicit,
+    // deliberate) will create-then-cancel a real job.
+    if (url.searchParams.get("create") !== "1") {
+      result.ok = calc.ok;
+      result.note = "safe mode: no print job created (auth + cost calc + validation only). Pass &create=1 to exercise the real create+cancel path (charges risk if cancel fails).";
+      return json(result);
+    }
 
     // Create. external_id marks it as a self test in the Lulu dashboard.
     const job = {
