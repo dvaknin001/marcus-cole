@@ -29,10 +29,14 @@ the Book Vault order. No Lulu fallback wanted (Lulu is ~2x the print price).
   `basic bv_<key>`). A US-address draft returns `ok:true, grandTotal 9.95, currency "GBP",
   criticalError false, lineErrors ["OK"], deletedDraft true`. So auth, ISBN resolution, customs,
   pricing and draft/delete all work end to end.
-- **In progress / pending:** (1) Fable 5.1 is reviewing bookvault.js against the Book Vault API
-  spec — findings not yet applied. (2) The margin check is currently SKIPPED when the order is
-  priced in a non-USD currency (see Dead ends) — a live GBP-priced order could ship at a loss;
-  needs a fix before go-live.
+- **Fable 5.1 review APPLIED (commit 947591f):** margin no longer fails open on non-USD (GBP
+  converted via FX_GBP_USD default 1.45; unconvertible currency parks a live order); idempotency
+  lock on any 2xx; stricter success (Active + no PaymentLink + no CriticalError + no Error
+  Messages); live POST gated on the draft DELETE; County falls back to Town for non-US; Email
+  required; customs IncoTerms DDU; dropped readOnly OrderMethod; self-test reads saved card +
+  billing currency and redacts getorder PII.
+- **Bundle now = its own Book Vault title (own ISBN) via BOOKVAULT_ISBN_BUNDLE** (one order line
+  = one parcel = one shipping charge). Needs the secret set (below).
 - **Not started:** flipping DRY_RUN=false; repointing the Gumroad product ping URLs to
   /api/bookvault; deleting the old Lulu function/secrets.
 
@@ -45,6 +49,9 @@ the Book Vault order. No Lulu fallback wanted (Lulu is ~2x the print price).
 - `BOOKVAULT_API_KEY` = the bv_ key. `BOOKVAULT_ISBN_LOCKIN` = 9656946000010.
   `BOOKVAULT_ISBN_YOURPHONE` = 9656946000034 (NOTE a stray duplicate library title
   9656946000027 "IMAGE COMING SOON" exists — do not order that one).
+- **TODO: `BOOKVAULT_ISBN_BUNDLE`** = the bundle title's ISBN (Dean has this set up in BV; not
+  yet added to Cloudflare). Without it, bundle sales park as "missing isbn".
+- Optional: `FX_GBP_USD` (default 1.45) — GBP→USD rate for the margin check while BV prices GBP.
 - Shared with Lulu (already set): GUMROAD_API_TOKEN, GUMROAD_SELLER_ID, FALLBACK_PHONE,
   SELFTEST_TOKEN (was reset this session to the value Dean set (in Cloudflare; not stored here)), DRY_RUN (currently NOT "false").
 - Optional: `BOOKVAULT_PAY_METHOD` (default "Saved" = saved card per order; "Credit" = prepaid
