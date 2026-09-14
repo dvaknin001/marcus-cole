@@ -95,7 +95,7 @@ const TIER = {
 };
 
 // Countries we fulfil. Gumroad reports an ISO 3166-1 alpha-2 code; the UK is "GB", not "UK".
-const SUPPORTED_COUNTRIES = new Set(["US", "CA", "GB", "AU"]);
+const SUPPORTED_COUNTRIES = new Set(["US", "CA", "GB"]);
 
 // Minimum profit (USD) we accept on a single sale after Gumroad fees and the Bookvault
 // order total (print + dispatch). Below this the sale is parked for a human instead of

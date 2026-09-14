@@ -12,6 +12,8 @@
 </head>
 <body>
 
+  <div class="sale"><span class="kick" style="font-size:11px;color:#fff;letter-spacing:2px;">Paperback ships to the UK, USA and Canada. Ebook available worldwide.</span></div>
+
   <div class="topbar">
     <div class="topbar-in">
       <a href="/" class="disp" style="font-size:18px;">Marcus Cole</a>
@@ -34,11 +36,11 @@
         <p>This book doesn't tell you to use your phone less. It hands you a system. The Dopamine Fast to reset your baseline. The Grayscale Protocol and the One Screen Rule to strip the machine of its power. A 30 day reset that rebuilds your attention from the ground up, with a tracker so you can't lie to yourself about it.</p>
         <p>Same voice as Lock In. Zero comfort. Written for the man who's done being a passenger in his own head.</p>
         <div class="price" style="margin:26px 0 20px 0;"><span class="disp now">$14.99</span><span class="was">$24.99</span></div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;">
-          <a class="cta btn-red gumroad-button" href="https://dvpress.gumroad.com/l/yourphonepaperback?variant=Standard%20Shipping&wanted=true" style="font-size:18px;padding:16px 24px;">Standard · $21.98</a>
-          <a class="cta btn-out gumroad-button" href="https://dvpress.gumroad.com/l/yourphonepaperback?variant=Express%20Shipping&wanted=true" style="font-size:18px;padding:16px 24px;">Express · $28.98</a>
-        </div>
-        <p style="font-size:12px;color:var(--dim);margin-top:14px;">Standard ships in about 3 weeks · Express about 2 weeks</p>
+        <button type="button" class="cta btn-red buy-paper" style="font-size:20px;padding:17px 26px;"
+          data-title="Your Phone Owns You · paperback"
+          data-std-url="https://dvpress.gumroad.com/l/yourphonepaperback?variant=Standard%20Shipping&wanted=true" data-std-price="$21.98"
+          data-exp-url="https://dvpress.gumroad.com/l/yourphonepaperback?variant=Express%20Shipping&wanted=true" data-exp-price="$28.98">Get the Paperback &rarr;</button>
+        <p style="font-size:12px;color:var(--dim);margin-top:14px;">Choose Standard or Express at the next step · ships to the UK, USA and Canada</p>
         <a class="gumroad-button" href="https://dvpress.gumroad.com/l/yourphone" style="display:inline-block;margin-top:6px;font-size:13px;color:var(--muted2);letter-spacing:1px;">Or get the instant ebook →</a>
       </div>
     </div>
@@ -50,6 +52,7 @@
   </footer>
 
 <!-- Gumroad overlay checkout --><script src="https://gumroad.com/js/gumroad.js"></script>
+<script src="../checkout.js"></script>
 <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "d1eaae2494ea4c88b56d13a0a2fb62db"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>
