@@ -374,8 +374,9 @@ export async function onRequestGet(context) {
       const isbn = str(env[book.isbnEnv]);
       if (!isbn) return json({ ...result, error: "missing " + book.isbnEnv });
       const g = await bvFetch(env, "/GlobalAv", "POST", { ISBN: isbn }, authOverride);
-      const list = Array.isArray(g.body) ? g.body.map((p) => ({ ID: p.ID, Name: p.Name, CurrencyID: p.CurrencyID, origin: p.OriginCountry ? p.OriginCountry.ISO_Code : null, prints: p.PrintOrders })) : null;
-      return json({ ...result, partners: { ok: g.ok, status: g.status, list, error: g.ok ? undefined : (g.raw || "").slice(0, 300) } });
+      const arr = Array.isArray(g.body) ? g.body : (g.body && Array.isArray(g.body.Partners) ? g.body.Partners : (g.body && Array.isArray(g.body.Data) ? g.body.Data : null));
+      const list = arr ? arr.map((p) => ({ ID: p.ID, Name: p.Name, CurrencyID: p.CurrencyID, origin: p.OriginCountry ? p.OriginCountry.ISO_Code : null, prints: p.PrintOrders })) : null;
+      return json({ ...result, partners: { ok: g.ok, status: g.status, list, raw: list ? undefined : (g.raw || "").slice(0, 900) } });
     }
 
     if (bookKey) {
