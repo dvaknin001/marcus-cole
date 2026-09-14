@@ -18,7 +18,7 @@ the Book Vault order. No Lulu fallback wanted (Lulu is ~2x the print price).
   from https://api.bookvault.app/v3/swagger/docs/v3 . Docs (ReDoc): https://api.bookvault.app/v3/docs
 
 ## Current state
-- **Done + deployed:** `functions/api/bookvault.js` — the Book Vault twin of the existing
+- **Done + deployed:** `functions/api/gumroad-bookvault.js` — the Book Vault twin of the existing
   `functions/api/gumroad-lulu.js`. Flow: untrusted Gumroad ping → re-fetch the real sale from
   Gumroad with our token → map product to a Book Vault title by ISBN → POST /Order?payMethod=Draft
   (FREE) to price + validate → margin check → when DRY_RUN=false, delete the draft and place the
@@ -38,10 +38,10 @@ the Book Vault order. No Lulu fallback wanted (Lulu is ~2x the print price).
 - **Bundle now = its own Book Vault title (own ISBN) via BOOKVAULT_ISBN_MC_BUNDLE** (one order line
   = one parcel = one shipping charge). Needs the secret set (below).
 - **Not started:** flipping DRY_RUN=false; repointing the Gumroad product ping URLs to
-  /api/bookvault; deleting the old Lulu function/secrets.
+  /api/gumroad-bookvault; deleting the old Lulu function/secrets.
 
 ## Files touched (in the marcus-cole repo)
-- `functions/api/bookvault.js` — NEW, the whole integration (~330 lines). Deployed.
+- `functions/api/gumroad-bookvault.js` — NEW, the whole integration (~330 lines). Deployed.
 - `wrangler.toml` — documented the new ORDERS KV keys (`bvorder:` / `bvfail:`). No new bindings.
 - `status.md` — this file.
 
@@ -59,13 +59,13 @@ the Book Vault order. No Lulu fallback wanted (Lulu is ~2x the print price).
 - Lulu-only secrets (LULU_*, ASSET_TOKEN) are safe to delete once fully off Lulu.
 
 ## Next action
-Apply the Fable 5.1 review findings to `functions/api/bookvault.js` (await its report), then
+Apply the Fable 5.1 review findings to `functions/api/gumroad-bookvault.js` (await its report), then
 resolve the currency/margin gap (below). Do NOT flip DRY_RUN to false until both are done and a
 real US test order confirms it prints+ships from a US facility.
 
 ## How to test (all free, nothing billable)
 Self-test URLs (replace token if SELFTEST_TOKEN changed):
-- Key + account:   `https://marcuscole.pages.dev/api/bookvault?selftest=<SELFTEST_TOKEN>`
+- Key + account:   `https://marcuscole.pages.dev/api/gumroad-bookvault?selftest=<SELFTEST_TOKEN>`
 - Price a draft:   `...&draft=lockin`  (and `&draft=yourphone`) — creates a free draft, returns
   grandTotal + currency, auto-deletes it.
 - Read an order:   `...&getorder=<PodRef>` ; cancel: `...&cancel=<PodRef>`
@@ -89,7 +89,7 @@ The only true test that it PRINTS + charges is one real order (DRY_RUN=false), w
    a loss while currency is GBP), or rely on US routing making it USD. Recommendation: add the FX
    safety conversion regardless — cheap insurance.
 3. Go-live steps when ready: set DRY_RUN=false; repoint Gumroad product ping URLs from
-   /api/gumroad-lulu to /api/bookvault.
+   /api/gumroad-lulu to /api/gumroad-bookvault.
 
 ## Gotchas
 - Book Vault auth is `Authorization: basic bv_<KEY>` (the key IS the credential, not base64

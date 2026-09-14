@@ -1,6 +1,6 @@
 // Cloudflare Pages Function: Gumroad sale ping to Bookvault print order
-// Route: POST https://marcuscole.pages.dev/api/bookvault
-//        GET  https://marcuscole.pages.dev/api/bookvault?selftest=<token>  (operator only, see bottom)
+// Route: POST https://marcuscole.pages.dev/api/gumroad-bookvault
+//        GET  https://marcuscole.pages.dev/api/gumroad-bookvault?selftest=<token>  (operator only, see bottom)
 //
 // This is the Bookvault twin of functions/api/gumroad-lulu.js. Same safe shape:
 // a customer buys a PHYSICAL paperback on Gumroad; Gumroad collects payment AND the

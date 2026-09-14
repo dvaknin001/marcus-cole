@@ -6,7 +6,7 @@ compatibility_date = "2024-09-01"
 # functions/api/gumroad-lulu.js:
 #   order:<sale_id>   = Lulu print job id (idempotency, never print a sale twice)
 #   fail:<sale_id>    = why a paid sale needs manual handling (no PII stored)
-# functions/api/bookvault.js:
+# functions/api/gumroad-bookvault.js:
 #   bvorder:<sale_id> = Bookvault PodRef of a released order (idempotency)
 #   bvfail:<sale_id>  = why a paid sale needs manual handling (no PII stored)
 [[kv_namespaces]]
