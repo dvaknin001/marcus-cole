@@ -86,7 +86,11 @@ const TIER = {
   express:  { requestedService: "Quickest" },
 };
 
-const SUPPORTED_COUNTRIES = new Set(["US"]);
+// Countries we fulfil. Gumroad reports the destination as an ISO 3166-1 alpha-2 code,
+// where the United Kingdom is "GB" (not "UK"). Book Vault prints from the UK and ships
+// worldwide, so a CA/GB/AU order is priced and dispatched the same way as a US one; the
+// margin floor still guards against the higher international postage.
+const SUPPORTED_COUNTRIES = new Set(["US", "CA", "GB", "AU"]);
 
 // Minimum profit (USD) we accept on a single sale after Gumroad fees and the Bookvault
 // order total (print + dispatch). Below this the sale is parked for a human instead of
