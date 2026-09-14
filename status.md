@@ -35,7 +35,7 @@ the Book Vault order. No Lulu fallback wanted (Lulu is ~2x the print price).
   Messages); live POST gated on the draft DELETE; County falls back to Town for non-US; Email
   required; customs IncoTerms DDU; dropped readOnly OrderMethod; self-test reads saved card +
   billing currency and redacts getorder PII.
-- **Bundle now = its own Book Vault title (own ISBN) via BOOKVAULT_ISBN_BUNDLE** (one order line
+- **Bundle now = its own Book Vault title (own ISBN) via BOOKVAULT_ISBN_MC_BUNDLE** (one order line
   = one parcel = one shipping charge). Needs the secret set (below).
 - **Not started:** flipping DRY_RUN=false; repointing the Gumroad product ping URLs to
   /api/bookvault; deleting the old Lulu function/secrets.
@@ -49,7 +49,7 @@ the Book Vault order. No Lulu fallback wanted (Lulu is ~2x the print price).
 - `BOOKVAULT_API_KEY` = the bv_ key. `BOOKVAULT_ISBN_LOCKIN` = 9656946000010.
   `BOOKVAULT_ISBN_YOURPHONE` = 9656946000034 (NOTE a stray duplicate library title
   9656946000027 "IMAGE COMING SOON" exists — do not order that one).
-- **TODO: `BOOKVAULT_ISBN_BUNDLE`** = the bundle title's ISBN (Dean has this set up in BV; not
+- **TODO: `BOOKVAULT_ISBN_MC_BUNDLE`** = the bundle title's ISBN (Dean has this set up in BV; not
   yet added to Cloudflare). Without it, bundle sales park as "missing isbn".
 - Optional: `FX_GBP_USD` (default 1.45) — GBP→USD rate for the margin check while BV prices GBP.
 - Shared with Lulu (already set): GUMROAD_API_TOKEN, GUMROAD_SELLER_ID, FALLBACK_PHONE,

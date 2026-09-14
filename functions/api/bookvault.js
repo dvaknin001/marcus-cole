@@ -17,15 +17,15 @@
 // default; "Credit" = draw from a prepaid balance). No prepaid funds are needed for
 // "Saved". The whole dry path is non billable; going live is a single flip of DRY_RUN.
 //
-// The BUNDLE is its own Bookvault title (its own ISBN, BOOKVAULT_ISBN_BUNDLE), so one
+// The BUNDLE is its own Bookvault title (its own ISBN, BOOKVAULT_ISBN_MC_BUNDLE), so one
 // bundle sale = one order line = one parcel = one shipping charge, never per book.
 //
 // SECRETS (set in Cloudflare Pages, Settings, Environment variables, NEVER in the repo):
 //   BOOKVAULT_API_KEY     the "bv_..." key from the Bookvault portal (Apps, Generate
 //                         Credentials). Sent as the HTTP Basic credential (see bvAuth).
-//   BOOKVAULT_ISBN_LOCKIN, BOOKVAULT_ISBN_YOURPHONE, BOOKVAULT_ISBN_BUNDLE
+//   BOOKVAULT_ISBN_LOCKIN, BOOKVAULT_ISBN_YOURPHONE, BOOKVAULT_ISBN_MC_BUNDLE
 //                         the 13 digit ISBN of each title AS IT EXISTS in your Bookvault
-//                         Library (a validated title). BUNDLE is the two book box/set title.
+//                         Library (a validated title). MC_BUNDLE is the two book box/set title.
 //                         Kept in env, never hardcoded.
 //   BOOKVAULT_CONTACT_EMAIL   optional, owner email used on the self test.
 //   BOOKVAULT_PAY_METHOD  optional, "Saved" (default) or "Credit".
@@ -59,7 +59,7 @@ const GUMROAD = "https://api.gumroad.com/v2";
 const BOOKS = {
   lockin:    { title: "Lock In",              isbnEnv: "BOOKVAULT_ISBN_LOCKIN" },
   yourphone: { title: "Your Phone Owns You",  isbnEnv: "BOOKVAULT_ISBN_YOURPHONE" },
-  bundle:    { title: "Marcus Cole Bundle",   isbnEnv: "BOOKVAULT_ISBN_BUNDLE" },
+  bundle:    { title: "Marcus Cole Bundle",   isbnEnv: "BOOKVAULT_ISBN_MC_BUNDLE" },
 };
 
 // Product to book mapping. Kept identical to gumroad-lulu.js so either fulfilment endpoint
