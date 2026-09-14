@@ -365,20 +365,6 @@ export async function onRequestGet(context) {
       return json({ ...result, cancel: { podRef: ref, ok: d.ok, status: d.status, error: d.ok ? undefined : (d.raw || "").slice(0, 300) } });
     }
 
-    // ?partners=<book>: list the print partners available for this title, each with its
-    // billing CurrencyID and origin country. Use it to find the USD / US partner ID, then
-    // set BOOKVAULT_PARTNER_ID_US (etc) so orders route there instead of the UK default.
-    if (url.searchParams.get("partners")) {
-      const book = BOOKS[url.searchParams.get("partners")];
-      if (!book) return json({ ...result, error: "unknown book, use lockin or yourphone" });
-      const isbn = str(env[book.isbnEnv]);
-      if (!isbn) return json({ ...result, error: "missing " + book.isbnEnv });
-      const g = await bvFetch(env, "/GlobalAv", "POST", { ISBN: isbn }, authOverride);
-      const arr = Array.isArray(g.body) ? g.body : (g.body && Array.isArray(g.body.Partners) ? g.body.Partners : (g.body && Array.isArray(g.body.Data) ? g.body.Data : null));
-      const list = arr ? arr.map((p) => ({ ID: p.ID, Name: p.Name, CurrencyID: p.CurrencyID, origin: p.OriginCountry ? p.OriginCountry.ISO_Code : null, prints: p.PrintOrders })) : null;
-      return json({ ...result, partners: { ok: g.ok, status: g.status, list, raw: list ? undefined : (g.raw || "").slice(0, 900) } });
-    }
-
     if (bookKey) {
       const book = BOOKS[bookKey];
       if (!book) return json({ ...result, error: "unknown book, use lockin or yourphone" });
