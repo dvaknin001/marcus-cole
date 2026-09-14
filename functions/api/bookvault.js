@@ -200,6 +200,7 @@ export async function onRequestPost(context) {
       DispatchRequest: { RequestedService: requestedService },
       OrderLines: built.lines,
       Notifications: { NotifyCustomer: false },
+      ...customsFor(country),
     };
 
     // ---- 12. create the FREE Draft to price and validate the order. payMethod=Draft never
@@ -364,6 +365,7 @@ export async function onRequestGet(context) {
         DocRef: "selftest_" + Date.now(), OrderMethod: "API", Status: "Draft", Address: testAddress,
         DispatchRequest: { RequestedService: "CheapestTracked" },
         OrderLines: [{ ISBN: isbn, Quantity: 1 }], Notifications: { NotifyCustomer: false },
+        ...customsFor("US"),
       };
 
       // ?validate=<book>: full validation, no payment, nothing created.
@@ -461,6 +463,16 @@ function buildOrderLines(env, product, saleQty) {
   }
   if (missing.length) return { ok: false, missing };
   return { ok: true, lines };
+}
+
+// Bookvault prints in the UK, so any non GB destination is an overseas shipment and
+// Bookvault requires a customs declaration. Books are HS code 4901.99 (printed books).
+// UseOrderValue lets Bookvault take the declared value from the order total, so we do not
+// have to compute or send a price. DAP = customer is liable for any import duties (books
+// are usually duty free under de minimis into US/CA/AU). Domestic GB orders need none.
+function customsFor(country) {
+  if (String(country).toUpperCase() === "GB") return {};
+  return { CustomsDeclaration: { UseOrderValue: true, HSCode: "4901990000", IncoTerms: "DAP", UseIOSS: false } };
 }
 
 // Best effort read of the order's currency from the Bookvault order body. Falls back to
