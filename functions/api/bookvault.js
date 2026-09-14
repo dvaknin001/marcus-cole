@@ -26,6 +26,9 @@
 //                         re uploaded or renumbered without a code edit. No ISBN is ever
 //                         hardcoded here.
 //   BOOKVAULT_CONTACT_EMAIL   optional, owner email used on the order/self test.
+//   BOOKVAULT_PAY_METHOD  optional, "Saved" (default, charge the saved card per order) or
+//                         "Credit" (draw from a prepaid balance). No prepaid funds needed
+//                         for "Saved".
 //   GUMROAD_API_TOKEN     Gumroad API access token, used to fetch the authoritative sale.
 //   GUMROAD_SELLER_ID     our Gumroad seller id; any sale not owned by it is rejected.
 //   FALLBACK_PHONE        business phone used when the buyer gave none.
@@ -255,30 +258,36 @@ export async function onRequestPost(context) {
       });
     }
 
-    // ---- 15. live: RELEASE the draft into production. This is the only billable step and
-    // draws from the prepaid balance. If the balance is short, Bookvault returns a payment
-    // link instead of releasing; we treat that as needsManual (top up, then release by hand).
-    const release = await bvFetch(env, "/Order?UpdateType=ReleaseOrder&PodRef=" + encodeURIComponent(podRef), "PUT", orderBody);
-    if (!release.ok) {
-      log("release failed", saleId, release.status, (release.raw || "").slice(0, 400));
-      await recordFail(env, saleId, "release failed", { podRef, status: release.status, tier, bvError: (release.raw || "").slice(0, 400) });
-      return json({ ok: false, needsManual: true, reason: "release failed" });
+    // ---- 15. live: place the real order, charged on demand. The pricing draft above was
+    // free; discard it, then POST the order for real with Status Active and a pay method.
+    //   BOOKVAULT_PAY_METHOD = "Saved"  (default) charge the saved card, per order
+    //                          "Credit"         draw from a prepaid balance (cheaper if funded)
+    // This is the only billable step. A payment link coming back means the chosen method could
+    // not settle (no card / no funds); we park it for a human rather than leave it hanging.
+    if (podRef) await bvFetch(env, "/Order?PodRef=" + encodeURIComponent(podRef), "DELETE");
+    const payMethod = str(env.BOOKVAULT_PAY_METHOD) || "Saved";
+    const liveBody = { ...orderBody, Status: "Active" };
+    const placed = await bvFetch(env, "/Order?payMethod=" + encodeURIComponent(payMethod), "POST", liveBody);
+    if (!placed.ok || !placed.body) {
+      log("place failed", saleId, placed.status, (placed.raw || "").slice(0, 400));
+      await recordFail(env, saleId, "place failed", { status: placed.status, tier, bvError: (placed.raw || "").slice(0, 400) });
+      return json({ ok: false, needsManual: true, reason: "place failed" });
     }
-    const rbody = release.body || {};
-    const releasedStatus = rbody.Status || null;
-    const paymentLink = rbody.OrderCost && rbody.OrderCost.PaymentLink ? true : false;
-    if (releasedStatus === "Draft" || paymentLink) {
-      // Still a draft / a payment link came back = balance not sufficient to release.
-      await recordFail(env, saleId, "needs funds", { podRef, tier });
-      log("release needs funds", saleId, "podref", podRef);
-      return json({ ok: false, needsManual: true, reason: "needs funds", podRef });
+    const rbody = placed.body;
+    const newRef = rbody.PodRef != null ? String(rbody.PodRef) : null;
+    const placedStatus = rbody.Status || null;
+    const needsPay = (rbody.OrderCost && rbody.OrderCost.PaymentLink) || placedStatus === "Draft";
+    if (needsPay || !newRef) {
+      await recordFail(env, saleId, "payment not settled", { podRef: newRef, payMethod, tier });
+      log("payment not settled", saleId, "podref", newRef, "method", payMethod);
+      return json({ ok: false, needsManual: true, reason: "payment not settled", podRef: newRef });
     }
 
     // Record the PodRef BEFORE answering so a retried ping can never double order.
-    const saved = await kvPut(env, "bvorder:" + saleId, podRef);
-    if (!saved) log("WARNING order released but KV write failed", saleId, "podref", podRef);
-    log("ORDER RELEASED", saleId, product.title, tier, "podref", podRef, "status", releasedStatus);
-    return json({ ok: true, podRef, status: releasedStatus, tier, requestedService });
+    const saved = await kvPut(env, "bvorder:" + saleId, newRef);
+    if (!saved) log("WARNING order placed but KV write failed", saleId, "podref", newRef);
+    log("ORDER PLACED", saleId, product.title, tier, "podref", newRef, "status", placedStatus, "pay", payMethod);
+    return json({ ok: true, podRef: newRef, status: placedStatus, tier, requestedService, payMethod });
   } catch (e) {
     console.log("[bv] exception", saleId, String(e && e.message ? e.message : e));
     if (saleId) await recordFail(env, saleId, "exception", { message: String(e && e.message ? e.message : e).slice(0, 200) });
